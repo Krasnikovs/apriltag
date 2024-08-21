@@ -151,9 +151,12 @@ install(FILES "${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}.pc"
 # Python wrapper
 option(BUILD_PYTHON_WRAPPER "Builds Python wrapper" ON)
 
-find_package(Python3 QUIET COMPONENTS Development NumPy)
+find_package(Python3 REQUIRED COMPONENTS Development NumPy)
 
+set(Python3_SOABI "cpython-38-x86_64-linux-gnu")
+# set(Python3_SOABI "cpython-38-x86_64-linux-gnu")
 if(BUILD_PYTHON_WRAPPER AND Python3_Development_FOUND AND Python3_NumPy_FOUND)
+# if(BUILD_PYTHON_WRAPPER AND Python3_Development_FOUND)
 
     include(CMake/vtkEncodeString.cmake)
 
@@ -168,6 +171,7 @@ if(BUILD_PYTHON_WRAPPER AND Python3_Development_FOUND AND Python3_NumPy_FOUND)
         ${PROJECT_BINARY_DIR}/apriltag_py_type_docstring.h
     )
 
+    # set(Python3_SOABI "cpython-38-x86_64-linux-gnu")
     # set the SOABI manually since renaming the library via OUTPUT_NAME does not work on MSVC
     set(apriltag_py_target "apriltag.${Python3_SOABI}")
     Python3_add_library(${apriltag_py_target} MODULE ${CMAKE_CURRENT_SOURCE_DIR}/apriltag_pywrap.c)
@@ -175,7 +179,8 @@ if(BUILD_PYTHON_WRAPPER AND Python3_Development_FOUND AND Python3_NumPy_FOUND)
     target_link_libraries(${apriltag_py_target} PRIVATE apriltag Python3::Python Python3::NumPy)
     target_include_directories(${apriltag_py_target} PRIVATE ${PROJECT_BINARY_DIR})
 
-    set(PY_DEST ${CMAKE_INSTALL_PREFIX}/lib/python${Python3_VERSION_MAJOR}.${Python3_VERSION_MINOR}/site-packages/)
+    # set(PY_DEST ${CMAKE_INSTALL_PREFIX}/lib/python${Python3_VERSION_MAJOR}.${Python3_VERSION_MINOR}/site-packages/)
+    set(PY_DEST $ENV{HOME}/.local/lib/python${Python3_VERSION_MAJOR}.${Python3_VERSION_MINOR}/site-packages/)
     install(TARGETS ${apriltag_py_target} LIBRARY DESTINATION ${PY_DEST})
 elseif(BUILD_PYTHON_WRAPPER)
     message(WARNING
